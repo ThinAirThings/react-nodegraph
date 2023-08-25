@@ -1,8 +1,8 @@
 {
-    "name": "@thinairthings/react-sync",
+    "name": "@thinairthings/react-nodegraph",
     "author": "Dan Lannan",
-    "version": "1.0.56",
-    "description": "React Synchronization Library",
+    "version": "1.0.0",
+    "description": "React Nodegraph Library",
     "module": "dist/index.esm.js",
     "types": "dist/index.d.ts",
     "type": "module",
@@ -34,7 +34,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/ThinAirThings/react-sync.git"
+        "url": "https://github.com/ThinAirThings/react-nodegraph.git"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/",
