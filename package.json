@@ -1,7 +1,7 @@
 {
     "name": "@thinairthings/react-nodegraph",
     "author": "Dan Lannan",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "React Nodegraph Library",
     "module": "dist/index.esm.js",
     "types": "dist/index.d.ts",
