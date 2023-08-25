@@ -17,13 +17,13 @@ const useTrigger = (cleanupCallback) => {
         },
     ];
 };
-const useStateMachine = (callback, dependencies, lifecycleHandlers) => {
+const useEdge = (callback, t1, lifecycleHandlers) => {
     // Set result state
-    const [result, setResult] = useImmer({
+    const [t2, setT2] = useImmer({
         type: 'pending'
     });
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.(result.value);
+        lifecycleHandlers?.cleanup?.(t2.value);
     });
     // Set the retry count ref
     const failureRetryCountRef = useRef(0);
@@ -33,32 +33,32 @@ const useStateMachine = (callback, dependencies, lifecycleHandlers) => {
     useEffect(() => {
         (async () => {
             if (trigger === 'triggered') {
-                setResult((draft) => {
-                    draft.type = 'pending';
+                setT2((edge) => {
+                    edge.type = 'pending';
                 });
                 setTrigger('done');
                 return;
             }
-            if (!dependencies.map(dependencyResult => dependencyResult.type === 'success').every(Boolean)) {
-                setResult((draft) => {
-                    draft.type = 'pending';
+            if (!t1.map(edge => edge.type === 'success').every(Boolean)) {
+                setT2((edge) => {
+                    edge.type = 'pending';
                 });
                 return;
             }
-            if (result.type === 'pending') {
-                const depValues = dependencies.map(dep => dep.value);
-                lifecycleHandlers?.pending?.(depValues);
+            if (t2.type === 'pending') {
+                const t1Values = t1.map(edge => edge.value);
+                lifecycleHandlers?.pending?.(t1Values);
                 try {
                     const success = failureRetryCallbackRef.current
-                        ? await failureRetryCallbackRef.current(depValues)
-                        : await callback(depValues);
+                        ? await failureRetryCallbackRef.current(t1Values)
+                        : await callback(t1Values);
                     // Clear failure references
                     failureRetryCountRef.current = 0;
                     failureErrorLogRef.current.length = 0;
                     failureRetryCallbackRef.current = null;
                     // Run success handler here to guarantee it run before the child's useEffect
-                    lifecycleHandlers?.success?.(success, depValues);
-                    setResult(() => ({
+                    lifecycleHandlers?.success?.(success, t1Values);
+                    setT2(() => ({
                         type: 'success',
                         value: success
                     }));
@@ -72,11 +72,11 @@ const useStateMachine = (callback, dependencies, lifecycleHandlers) => {
                             failureRetryCallbackRef.current = newCallback;
                         else
                             failureRetryCallbackRef.current = null;
-                        setResult(() => ({
+                        setT2(() => ({
                             type: 'pending'
                         }));
                     };
-                    setResult(() => ({
+                    setT2(() => ({
                         type: 'failure',
                         value: error
                     }));
@@ -96,11 +96,11 @@ const useStateMachine = (callback, dependencies, lifecycleHandlers) => {
                 }
             }
         })();
-    }, [trigger, result, ...dependencies]); // Add result here
+    }, [trigger, t2, ...t1]); // Add result here
     return [
-        result,
+        t2,
         () => setTrigger('triggered')
     ];
 };
 
-export { useStateMachine };
+export { useEdge };
