@@ -3,12 +3,12 @@
     "author": "Dan Lannan",
     "version": "1.0.3",
     "description": "React Nodegraph Library",
-    "module": "dist/index.esm.js",
+    "module": "dist/index.mjs",
     "types": "dist/index.d.ts",
     "type": "module",
     "exports": {
-        "import": "./dist/index.esm.js",
-        "require": "./dist/index.cjs.js",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs",
         "types": "./dist/index.d.ts"
     },
     "devDependencies": {
