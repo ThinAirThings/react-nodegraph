@@ -10,7 +10,7 @@ export type Edge<T> = {
 type DirectDependencyValues<T1 extends Array<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never;
 };
-export declare const useEdge: <T2, T1 extends Edge<any>[]>(callback: (t1: DirectDependencyValues<T1>) => Promise<T2>, t1: T1, lifecycleHandlers?: {
+export declare const useEdge: <T1 extends Edge<any>[], T2>(callback: (t1: DirectDependencyValues<T1>) => Promise<T2>, t1: T1, lifecycleHandlers?: {
     pending?: (t1: DirectDependencyValues<T1>) => void;
     success?: (t2: T2, t1: DirectDependencyValues<T1>) => void;
     cleanup?: (value: T2) => Promise<void> | void;
