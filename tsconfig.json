@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"outDir": "jsbin",
+		"module": "NodeNext",	// Output module format
+		"moduleResolution": "NodeNext",	// Input module format
+		"esModuleInterop": true,
+		"target": "ES2021", // Node.js 16 flavor of js
+		"noUnusedLocals": false,
+		"jsx": "react-jsx",
+		"rootDir": "src",
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noUnusedParameters": true,
+		"skipLibCheck": true,
+		"noImplicitAny": true,
+		"strictFunctionTypes": true
+	},
+	"include": [
+		"src/**/*",
+	],
+	"exclude": ["build", "dist"]
+}
