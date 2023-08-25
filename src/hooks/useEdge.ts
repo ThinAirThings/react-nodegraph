@@ -25,7 +25,7 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 type DirectDependencyValues<T1 extends Array<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never
 }
-export const useEdge = <T1 extends Array<Edge<any>>, T2>(
+export const useEdge = <T2, T1 extends Array<Edge<any>>>(
     callback: (t1: DirectDependencyValues<T1>) => Promise<T2>,
     t1: T1,
     lifecycleHandlers?: {
