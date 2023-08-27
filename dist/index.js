@@ -17,13 +17,13 @@ const useTrigger = (cleanupCallback) => {
         },
     ];
 };
-const useEdge = (callback, t1, lifecycleHandlers) => {
+const useNode = (callback, inputEdges, lifecycleHandlers) => {
     // Set result state
-    const [t2, setT2] = useImmer({
+    const [outputEdge, setOutputEdge] = useImmer({
         type: 'pending'
     });
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.(t2.value);
+        lifecycleHandlers?.cleanup?.(outputEdge.value);
     });
     // Set the retry count ref
     const failureRetryCountRef = useRef(0);
@@ -33,32 +33,32 @@ const useEdge = (callback, t1, lifecycleHandlers) => {
     useEffect(() => {
         (async () => {
             if (trigger === 'triggered') {
-                setT2((edge) => {
+                setOutputEdge((edge) => {
                     edge.type = 'pending';
                 });
                 setTrigger('done');
                 return;
             }
-            if (!t1.map(edge => edge.type === 'success').every(Boolean)) {
-                setT2((edge) => {
+            if (!inputEdges.map(edge => edge.type === 'success').every(Boolean)) {
+                setOutputEdge((edge) => {
                     edge.type = 'pending';
                 });
                 return;
             }
-            if (t2.type === 'pending') {
-                const t1Values = t1.map(edge => edge.value);
-                lifecycleHandlers?.pending?.(t1Values);
+            if (outputEdge.type === 'pending') {
+                const edgeValues = inputEdges.map(edge => edge.value);
+                lifecycleHandlers?.pending?.(edgeValues);
                 try {
                     const success = failureRetryCallbackRef.current
-                        ? await failureRetryCallbackRef.current(t1Values)
-                        : await callback(t1Values);
+                        ? await failureRetryCallbackRef.current(edgeValues)
+                        : await callback(edgeValues);
                     // Clear failure references
                     failureRetryCountRef.current = 0;
                     failureErrorLogRef.current.length = 0;
                     failureRetryCallbackRef.current = null;
                     // Run success handler here to guarantee it run before the child's useEffect
-                    lifecycleHandlers?.success?.(success, t1Values);
-                    setT2(() => ({
+                    lifecycleHandlers?.success?.(success, edgeValues);
+                    setOutputEdge(() => ({
                         type: 'success',
                         value: success
                     }));
@@ -72,11 +72,11 @@ const useEdge = (callback, t1, lifecycleHandlers) => {
                             failureRetryCallbackRef.current = newCallback;
                         else
                             failureRetryCallbackRef.current = null;
-                        setT2(() => ({
+                        setOutputEdge(() => ({
                             type: 'pending'
                         }));
                     };
-                    setT2(() => ({
+                    setOutputEdge(() => ({
                         type: 'failure',
                         value: error
                     }));
@@ -96,11 +96,11 @@ const useEdge = (callback, t1, lifecycleHandlers) => {
                 }
             }
         })();
-    }, [trigger, t2, ...t1]); // Add result here
+    }, [trigger, outputEdge, ...inputEdges]); // Add result here
     return [
-        t2,
+        outputEdge,
         () => setTrigger('triggered')
     ];
 };
 
-export { useEdge };
+export { useNode };

@@ -22,15 +22,15 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     ] as const
 }
 
-type DirectDependencyValues<T1 extends Array<Edge<any>>> = {
+type EdgeValues<T1 extends Array<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never
 }
-export const useEdge = <T1 extends Array<Edge<any>>, T2>(
-    callback: (t1: DirectDependencyValues<T1>) => Promise<T2>,
-    t1: T1,
+export const useNode = <T1 extends Array<Edge<any>>, T2>(
+    callback: (t1: EdgeValues<T1>) => Promise<T2>,
+    inputEdges: T1,
     lifecycleHandlers?: {
-        pending?: (t1: DirectDependencyValues<T1>) => void,
-        success?: (t2: T2, t1: DirectDependencyValues<T1>) => void
+        pending?: (t1: EdgeValues<T1>) => void,
+        success?: (t2: T2, t1: EdgeValues<T1>) => void
         cleanup?: (value: T2) => Promise<void>|void
         failure?: {
             maxRetryCount?: number
@@ -48,11 +48,11 @@ export const useEdge = <T1 extends Array<Edge<any>>, T2>(
     }, 
 ) => {
     // Set result state
-    const [t2, setT2] = useImmer<Edge<T2>>({
+    const [outputEdge, setOutputEdge] = useImmer<Edge<T2>>({
         type: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.((t2 as Edge<T2> & { type: 'success' }).value)
+        lifecycleHandlers?.cleanup?.((outputEdge as Edge<T2> & { type: 'success' }).value)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
@@ -62,32 +62,32 @@ export const useEdge = <T1 extends Array<Edge<any>>, T2>(
     useEffect(() => {
         (async () => {
             if (trigger === 'triggered') {
-                setT2((edge) => {
+                setOutputEdge((edge) => {
                     edge.type = 'pending'
                 })
                 setTrigger('done')
                 return
             }
-            if (!t1.map(edge => edge.type === 'success').every(Boolean)) {
-                setT2((edge) => {
+            if (!inputEdges.map(edge => edge.type === 'success').every(Boolean)) {
+                setOutputEdge((edge) => {
                     edge.type = 'pending'
                 })
                 return
             }
-            if (t2.type === 'pending') {
-                const t1Values = t1.map(edge => (edge as Edge<any>  & { type: 'success' }).value) as DirectDependencyValues<T1>;
-                lifecycleHandlers?.pending?.(t1Values)
+            if (outputEdge.type === 'pending') {
+                const edgeValues = inputEdges.map(edge => (edge as Edge<any>  & { type: 'success' }).value) as EdgeValues<T1>;
+                lifecycleHandlers?.pending?.(edgeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
-                        ? await failureRetryCallbackRef.current(t1Values)
-                        : await callback(t1Values) 
+                        ? await failureRetryCallbackRef.current(edgeValues)
+                        : await callback(edgeValues) 
                     // Clear failure references
                     failureRetryCountRef.current = 0
                     failureErrorLogRef.current.length = 0
                     failureRetryCallbackRef.current = null
                     // Run success handler here to guarantee it run before the child's useEffect
-                    lifecycleHandlers?.success?.(success, t1Values)
-                    setT2(() => ({
+                    lifecycleHandlers?.success?.(success, edgeValues)
+                    setOutputEdge(() => ({
                         type: 'success',
                         value: success
                     }))
@@ -98,11 +98,11 @@ export const useEdge = <T1 extends Array<Edge<any>>, T2>(
                     const runRetry = (newCallback?: typeof callback) => {
                         if (newCallback) failureRetryCallbackRef.current = newCallback
                         else failureRetryCallbackRef.current = null
-                        setT2(() => ({
+                        setOutputEdge(() => ({
                             type: 'pending'
                         }))
                     }
-                    setT2(() => ({
+                    setOutputEdge(() => ({
                         type: 'failure',
                         value: error
                     }))
@@ -122,9 +122,9 @@ export const useEdge = <T1 extends Array<Edge<any>>, T2>(
                 }
             }
         })()
-    }, [trigger, t2, ...t1])   // Add result here
+    }, [trigger, outputEdge, ...inputEdges])   // Add result here
     return [
-        t2, 
+        outputEdge, 
         () => setTrigger('triggered')
     ] as const
 }
