@@ -27,10 +27,10 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     ] as const
 }
 
-type EdgeValues<T1 extends Array<Edge<any>>> = {
+type EdgeValues<T1 extends ReadonlyArray<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never
 }
-export const useVertex = <T1 extends Array<Edge<any>>, T2>(
+export const useVertex = <T1 extends ReadonlyArray<Edge<any>>, T2>(
     callback: (t1: EdgeValues<T1>) => Promise<T2>,
     inputEdges: T1,
     lifecycleHandlers?: {

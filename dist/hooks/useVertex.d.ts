@@ -13,10 +13,10 @@ export type Vertex<T extends Array<any>> = FC<{
         [K in keyof T]: Edge<T[K]>;
     } : never;
 }>;
-type EdgeValues<T1 extends Array<Edge<any>>> = {
+type EdgeValues<T1 extends ReadonlyArray<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never;
 };
-export declare const useVertex: <T1 extends Edge<any>[], T2>(callback: (t1: EdgeValues<T1>) => Promise<T2>, inputEdges: T1, lifecycleHandlers?: {
+export declare const useVertex: <T1 extends readonly Edge<any>[], T2>(callback: (t1: EdgeValues<T1>) => Promise<T2>, inputEdges: T1, lifecycleHandlers?: {
     pending?: (t1: EdgeValues<T1>) => void;
     success?: (t2: T2, t1: EdgeValues<T1>) => void;
     cleanup?: (value: T2) => Promise<void> | void;
