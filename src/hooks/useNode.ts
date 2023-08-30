@@ -6,8 +6,10 @@ export type Edge<T> =
     | {type: 'success', value: T}
     | {type: 'failure', error: Error}
 
-export type Vertex<T> = FC<{
-    inputEdge: Edge<T>
+export type Vertex<T extends Record<string, any> | Array<Record<string, any>>> = FC<{
+    input: T extends Array<Record<string, any>> ? {
+        [K in keyof T]: Edge<T[K]>
+    } : Edge<T>
 }>
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     const [trigger, setTrigger] = useState<'triggered' | 'done'>('triggered')
