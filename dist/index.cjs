@@ -19,7 +19,7 @@ const useTrigger = (cleanupCallback) => {
         },
     ];
 };
-const useNode = (callback, inputEdges, lifecycleHandlers) => {
+const useVertex = (callback, inputEdges, lifecycleHandlers) => {
     // Set result state
     const [outputEdge, setOutputEdge] = useImmer.useImmer({
         type: 'pending'
@@ -105,4 +105,4 @@ const useNode = (callback, inputEdges, lifecycleHandlers) => {
     ];
 };
 
-exports.useNode = useNode;
+exports.useVertex = useVertex;
