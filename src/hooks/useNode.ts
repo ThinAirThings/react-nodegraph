@@ -6,8 +6,8 @@ export type Edge<T> =
     | {type: 'success', value: T}
     | {type: 'failure', error: Error}
 
-export type Vertex<T extends Array<Record<string, any>>> = FC<{
-    inputEdges: T extends Array<Record<string, any>> ? {
+export type Vertex<T extends Array<any>> = FC<{
+    inputEdges: T extends Array<any> ? {
         [K in keyof T]: Edge<T[K]>
     } : never
 }>
