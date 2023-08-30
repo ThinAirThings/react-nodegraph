@@ -1,3 +1,4 @@
+import { FC } from "react";
 export type Edge<T> = {
     type: 'pending';
 } | {
@@ -7,6 +8,7 @@ export type Edge<T> = {
     type: 'failure';
     error: Error;
 };
+export type Vertex<T> = FC<Edge<T>>;
 type EdgeValues<T1 extends Array<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never;
 };

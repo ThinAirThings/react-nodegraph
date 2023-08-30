@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
 export type Edge<T> = 
@@ -6,6 +6,7 @@ export type Edge<T> =
     | {type: 'success', value: T}
     | {type: 'failure', error: Error}
 
+export type Vertex<T> = FC<Edge<T>>
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     const [trigger, setTrigger] = useState<'triggered' | 'done'>('triggered')
     return [
