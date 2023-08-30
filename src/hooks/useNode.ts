@@ -6,7 +6,9 @@ export type Edge<T> =
     | {type: 'success', value: T}
     | {type: 'failure', error: Error}
 
-export type Vertex<T> = FC<Edge<T>>
+export type Vertex<T> = FC<{
+    inputEdge: Edge<T>
+}>
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     const [trigger, setTrigger] = useState<'triggered' | 'done'>('triggered')
     return [
