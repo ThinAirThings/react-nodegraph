@@ -29,7 +29,7 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 
 type EdgeValues<T1 extends Array<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never
-}[keyof T1]
+}
 export const useVertex = <T1 extends Array<Edge<any>>, T2>(
     callback: (t1: EdgeValues<T1>) => Promise<T2>,
     inputEdges: T1,
