@@ -8,10 +8,10 @@ export type Edge<T> = {
     type: 'failure';
     error: Error;
 };
-export type Vertex<T extends Array<any>> = FC<{
-    inputEdges: T extends Array<any> ? {
+export type Vertex<T extends ReadonlyArray<any>> = FC<{
+    inputEdges: {
         [K in keyof T]: Edge<T[K]>;
-    } : never;
+    };
 }>;
 type EdgeValues<T1 extends ReadonlyArray<Edge<any>>> = {
     [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never;
