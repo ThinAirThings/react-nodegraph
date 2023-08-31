@@ -6,9 +6,9 @@ export type Edge<T> =
     | {type: 'success', value: T}
     | {type: 'failure', error: Error}
 
-export type Vertex<T extends ReadonlyArray<any>> = FC<{
+export type Vertex<E1 extends ReadonlyArray<any>> = FC<{
     inputEdges: {
-        [K in keyof T]: Edge<T[K]>
+        [K in keyof E1]: Edge<E1[K]>
     }
 }>
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
@@ -27,16 +27,16 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     ] as const
 }
 
-type EdgeValues<T1 extends ReadonlyArray<Edge<any>>> = {
-    [K in keyof T1]: T1[K] extends Edge<infer U> ? U : never
+type EdgeValues<E1 extends ReadonlyArray<Record<string, any>>> = {
+    [K in keyof E1]: E1[K] extends Edge<infer U> ? U : never
 }
-export const useVertex = <T1 extends ReadonlyArray<Edge<any>>, T2>(
-    callback: (t1: EdgeValues<T1>) => Promise<T2>,
-    inputEdges: T1,
+export const useVertex = <E1 extends ReadonlyArray<any>, E2>(
+    callback: (t1: EdgeValues<E1>) => Promise<E2>,
+    inputEdges: E1,
     lifecycleHandlers?: {
-        pending?: (t1: EdgeValues<T1>) => void,
-        success?: (t2: T2, t1: EdgeValues<T1>) => void
-        cleanup?: (value: T2) => Promise<void>|void
+        pending?: (t1: EdgeValues<E1>) => void,
+        success?: (t2: E2, t1: EdgeValues<E1>) => void
+        cleanup?: (value: E2) => Promise<void>|void
         failure?: {
             maxRetryCount?: number
             retry?: (error: Error, failureLog: {
@@ -53,11 +53,11 @@ export const useVertex = <T1 extends ReadonlyArray<Edge<any>>, T2>(
     }, 
 ) => {
     // Set result state
-    const [outputEdge, setOutputEdge] = useImmer<Edge<T2>>({
+    const [outputEdge, setOutputEdge] = useImmer<Edge<E2>>({
         type: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.((outputEdge as Edge<T2> & { type: 'success' }).value)
+        lifecycleHandlers?.cleanup?.((outputEdge as Edge<E2> & { type: 'success' }).value)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
@@ -80,7 +80,7 @@ export const useVertex = <T1 extends ReadonlyArray<Edge<any>>, T2>(
                 return
             }
             if (outputEdge.type === 'pending') {
-                const edgeValues = inputEdges.map(edge => (edge as Edge<any>  & { type: 'success' }).value) as EdgeValues<T1>;
+                const edgeValues = inputEdges.map(edge => (edge as Edge<any>  & { type: 'success' }).value) as EdgeValues<E1>;
                 lifecycleHandlers?.pending?.(edgeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
