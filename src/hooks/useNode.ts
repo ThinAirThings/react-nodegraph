@@ -30,7 +30,7 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 type EdgeValues<E1 extends ReadonlyArray<Record<string, any>>> = {
     [K in keyof E1]: E1[K] extends Edge<infer U> ? U : never
 }
-export const useVertex = <E1 extends ReadonlyArray<any>, E2>(
+export const useNode = <E1 extends ReadonlyArray<any>, E2>(
     callback: (t1: EdgeValues<E1>) => Promise<E2>,
     inputEdges: E1,
     lifecycleHandlers?: {
