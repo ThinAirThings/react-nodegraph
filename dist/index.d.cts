@@ -4,7 +4,7 @@ type Edge<T> = {
     type: 'pending';
 } | {
     type: 'success';
-    value: T;
+    next: T;
 } | {
     type: 'failure';
     error: Error;

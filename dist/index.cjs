@@ -46,7 +46,7 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
     type: "pending"
   });
   const [trigger, setTrigger] = useTrigger(() => {
-    lifecycleHandlers?.cleanup?.(outputEdge.value);
+    lifecycleHandlers?.cleanup?.(outputEdge.next);
   });
   const failureRetryCountRef = (0, import_react.useRef)(0);
   const failureErrorLogRef = (0, import_react.useRef)([]);
@@ -67,7 +67,7 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
         return;
       }
       if (outputEdge.type === "pending") {
-        const edgeValues = inputEdges.map((edge) => edge.value);
+        const edgeValues = inputEdges.map((edge) => edge.next);
         lifecycleHandlers?.pending?.(edgeValues);
         try {
           const success = failureRetryCallbackRef.current ? await failureRetryCallbackRef.current(edgeValues) : await callback(edgeValues);

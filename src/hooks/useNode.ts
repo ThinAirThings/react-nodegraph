@@ -3,7 +3,7 @@ import { useImmer } from "use-immer"
 
 export type Edge<T> = 
     | {type: 'pending'}
-    | {type: 'success', value: T}
+    | {type: 'success', next: T}
     | {type: 'failure', error: Error}
 
 export type Vertex<E1 extends ReadonlyArray<any>> = FC<{
@@ -57,7 +57,7 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
         type: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.((outputEdge as Edge<E2> & { type: 'success' }).value)
+        lifecycleHandlers?.cleanup?.((outputEdge as Edge<E2> & { type: 'success' }).next)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
@@ -80,7 +80,7 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
                 return
             }
             if (outputEdge.type === 'pending') {
-                const edgeValues = inputEdges.map(edge => (edge as Edge<any>  & { type: 'success' }).value) as EdgeValues<E1>;
+                const edgeValues = inputEdges.map(edge => (edge as Edge<any>  & { type: 'success' }).next) as EdgeValues<E1>;
                 lifecycleHandlers?.pending?.(edgeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
