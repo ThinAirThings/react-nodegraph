@@ -111,7 +111,7 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
                         type: 'failure',
                         error: error
                     }))
-                    if (failureRetryCountRef.current > (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
+                    if (failureRetryCountRef.current >= (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
                         lifecycleHandlers?.failure?.final?.({
                             errorLog: failureErrorLogRef.current,
                             maxRetryCount: failureRetryCountRef.current

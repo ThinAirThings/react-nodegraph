@@ -96,7 +96,7 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
             type: "failure",
             error
           }));
-          if (failureRetryCountRef.current > (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
+          if (failureRetryCountRef.current >= (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
             lifecycleHandlers?.failure?.final?.({
               errorLog: failureErrorLogRef.current,
               maxRetryCount: failureRetryCountRef.current
