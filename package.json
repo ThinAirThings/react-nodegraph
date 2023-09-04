@@ -1,7 +1,7 @@
 {
     "name": "@thinairthings/react-nodegraph",
     "author": "Dan Lannan",
-    "version": "1.0.22",
+    "version": "1.0.23",
     "description": "React Nodegraph Library",
     "types": "dist/index.d.ts",
     "type": "module",
