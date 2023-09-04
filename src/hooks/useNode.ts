@@ -94,7 +94,7 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
                     lifecycleHandlers?.success?.(success, edgeValues)
                     setOutputEdge(() => ({
                         type: 'success',
-                        value: success
+                        next: success
                     }))
                 } catch (_error) {
                     const error = _error as Error
@@ -109,7 +109,7 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
                     }
                     setOutputEdge(() => ({
                         type: 'failure',
-                        value: error
+                        error: error
                     }))
                     if (failureRetryCountRef.current > (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
                         lifecycleHandlers?.failure?.final?.({

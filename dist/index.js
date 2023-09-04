@@ -51,7 +51,7 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
           lifecycleHandlers?.success?.(success, edgeValues);
           setOutputEdge(() => ({
             type: "success",
-            value: success
+            next: success
           }));
         } catch (_error) {
           const error = _error;
@@ -68,7 +68,7 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
           };
           setOutputEdge(() => ({
             type: "failure",
-            value: error
+            error
           }));
           if (failureRetryCountRef.current > (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
             lifecycleHandlers?.failure?.final?.({
