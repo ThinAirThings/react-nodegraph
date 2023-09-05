@@ -1,16 +1,12 @@
-import { FC, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
-export type Edge<T> = 
-    | {type: 'pending'}
-    | {type: 'success', next: T}
-    | {type: 'failure', error: Error}
+export type AirNode<T> = 
+    | {state: 'pending'}
+    | {state: 'success', data: T}
+    | {state: 'failure', error: Error}
 
-export type Vertex<E1 extends ReadonlyArray<any>> = FC<{
-    inputEdges: {
-        [K in keyof E1]: Edge<E1[K]>
-    }
-}>
+
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     const [trigger, setTrigger] = useState<'triggered' | 'done'>('triggered')
     return [
@@ -27,16 +23,16 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     ] as const
 }
 
-type EdgeValues<E1 extends ReadonlyArray<Record<string, any>>> = {
-    [K in keyof E1]: E1[K] extends Edge<infer U> ? U : never
+type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
+    [K in keyof In]: In[K] extends AirNode<infer U> ? U : never
 }
-export const useNode = <E1 extends ReadonlyArray<any>, E2>(
-    callback: (t1: EdgeValues<E1>) => Promise<E2>,
-    inputEdges: E1,
+export const useEdge = <In extends ReadonlyArray<any>, Out>(
+    callback: (t1: NodeValues<In>) => Promise<Out>,
+    inputNodes: In,
     lifecycleHandlers?: {
-        pending?: (t1: EdgeValues<E1>) => void,
-        success?: (t2: E2, t1: EdgeValues<E1>) => void
-        cleanup?: (value: E2) => Promise<void>|void
+        pending?: (t1: NodeValues<In>) => void,
+        success?: (t2: Out, t1: NodeValues<In>) => void
+        cleanup?: (value: Out) => Promise<void>|void
         failure?: {
             maxRetryCount?: number
             retry?: (error: Error, failureLog: {
@@ -53,11 +49,11 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
     }, 
 ) => {
     // Set result state
-    const [outputEdge, setOutputEdge] = useImmer<Edge<E2>>({
-        type: 'pending'
+    const [outputNode, setOutputNode] = useImmer<AirNode<Out>>({
+        state: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.((outputEdge as Edge<E2> & { type: 'success' }).next)
+        lifecycleHandlers?.cleanup?.((outputNode as AirNode<Out> & { state: 'success' }).data)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
@@ -67,34 +63,34 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
     useEffect(() => {
         (async () => {
             if (trigger === 'triggered') {
-                setOutputEdge((edge) => {
-                    edge.type = 'pending'
+                setOutputNode((node) => {
+                    node.state = 'pending'
                 })
                 setTrigger('done')
                 return
             }
-            if (!inputEdges.map(edge => edge.type === 'success').every(Boolean)) {
-                setOutputEdge((edge) => {
-                    edge.type = 'pending'
+            if (!inputNodes.map(node => node.state === 'success').every(Boolean)) {
+                setOutputNode((node) => {
+                    node.state = 'pending'
                 })
                 return
             }
-            if (outputEdge.type === 'pending') {
-                const edgeValues = inputEdges.map(edge => (edge as Edge<any>  & { type: 'success' }).next) as EdgeValues<E1>;
-                lifecycleHandlers?.pending?.(edgeValues)
+            if (outputNode.state === 'pending') {
+                const nodeValues = inputNodes.map(node => (node as AirNode<any>  & { state: 'success' }).data) as NodeValues<In>;
+                lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
-                        ? await failureRetryCallbackRef.current(edgeValues)
-                        : await callback(edgeValues) 
+                        ? await failureRetryCallbackRef.current(nodeValues)
+                        : await callback(nodeValues) 
                     // Clear failure references
                     failureRetryCountRef.current = 0
                     failureErrorLogRef.current.length = 0
                     failureRetryCallbackRef.current = null
                     // Run success handler here to guarantee it run before the child's useEffect
-                    lifecycleHandlers?.success?.(success, edgeValues)
-                    setOutputEdge(() => ({
-                        type: 'success',
-                        next: success
+                    lifecycleHandlers?.success?.(success, nodeValues)
+                    setOutputNode(() => ({
+                        state: 'success',
+                        data: success
                     }))
                 } catch (_error) {
                     const error = _error as Error
@@ -103,12 +99,12 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
                     const runRetry = (newCallback?: typeof callback) => {
                         if (newCallback) failureRetryCallbackRef.current = newCallback
                         else failureRetryCallbackRef.current = null
-                        setOutputEdge(() => ({
-                            type: 'pending'
+                        setOutputNode(() => ({
+                            state: 'pending'
                         }))
                     }
-                    setOutputEdge(() => ({
-                        type: 'failure',
+                    setOutputNode(() => ({
+                        state: 'failure',
                         error: error
                     }))
                     if (failureRetryCountRef.current >= (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
@@ -127,9 +123,9 @@ export const useNode = <E1 extends ReadonlyArray<any>, E2>(
                 }
             }
         })()
-    }, [trigger, outputEdge, ...inputEdges])   // Add result here
+    }, [trigger, outputNode, ...inputNodes])   // Add result here
     return [
-        outputEdge, 
+        outputNode, 
         () => setTrigger('triggered')
     ] as const
 }

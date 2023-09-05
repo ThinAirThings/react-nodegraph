@@ -1,4 +1,4 @@
-// src/hooks/useNode.ts
+// src/hooks/useEdge.ts
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
 var useTrigger = (cleanupCallback) => {
@@ -15,12 +15,12 @@ var useTrigger = (cleanupCallback) => {
     }
   ];
 };
-var useNode = (callback, inputEdges, lifecycleHandlers) => {
-  const [outputEdge, setOutputEdge] = useImmer({
-    type: "pending"
+var useEdge = (callback, inputNodes, lifecycleHandlers) => {
+  const [outputNode, setOutputNode] = useImmer({
+    state: "pending"
   });
   const [trigger, setTrigger] = useTrigger(() => {
-    lifecycleHandlers?.cleanup?.(outputEdge.next);
+    lifecycleHandlers?.cleanup?.(outputNode.data);
   });
   const failureRetryCountRef = useRef(0);
   const failureErrorLogRef = useRef([]);
@@ -28,30 +28,30 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
   useEffect(() => {
     (async () => {
       if (trigger === "triggered") {
-        setOutputEdge((edge) => {
-          edge.type = "pending";
+        setOutputNode((node) => {
+          node.state = "pending";
         });
         setTrigger("done");
         return;
       }
-      if (!inputEdges.map((edge) => edge.type === "success").every(Boolean)) {
-        setOutputEdge((edge) => {
-          edge.type = "pending";
+      if (!inputNodes.map((node) => node.state === "success").every(Boolean)) {
+        setOutputNode((node) => {
+          node.state = "pending";
         });
         return;
       }
-      if (outputEdge.type === "pending") {
-        const edgeValues = inputEdges.map((edge) => edge.next);
-        lifecycleHandlers?.pending?.(edgeValues);
+      if (outputNode.state === "pending") {
+        const nodeValues = inputNodes.map((node) => node.data);
+        lifecycleHandlers?.pending?.(nodeValues);
         try {
-          const success = failureRetryCallbackRef.current ? await failureRetryCallbackRef.current(edgeValues) : await callback(edgeValues);
+          const success = failureRetryCallbackRef.current ? await failureRetryCallbackRef.current(nodeValues) : await callback(nodeValues);
           failureRetryCountRef.current = 0;
           failureErrorLogRef.current.length = 0;
           failureRetryCallbackRef.current = null;
-          lifecycleHandlers?.success?.(success, edgeValues);
-          setOutputEdge(() => ({
-            type: "success",
-            next: success
+          lifecycleHandlers?.success?.(success, nodeValues);
+          setOutputNode(() => ({
+            state: "success",
+            data: success
           }));
         } catch (_error) {
           const error = _error;
@@ -62,12 +62,12 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
               failureRetryCallbackRef.current = newCallback;
             else
               failureRetryCallbackRef.current = null;
-            setOutputEdge(() => ({
-              type: "pending"
+            setOutputNode(() => ({
+              state: "pending"
             }));
           };
-          setOutputEdge(() => ({
-            type: "failure",
+          setOutputNode(() => ({
+            state: "failure",
             error
           }));
           if (failureRetryCountRef.current >= (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
@@ -86,12 +86,12 @@ var useNode = (callback, inputEdges, lifecycleHandlers) => {
         }
       }
     })();
-  }, [trigger, outputEdge, ...inputEdges]);
+  }, [trigger, outputNode, ...inputNodes]);
   return [
-    outputEdge,
+    outputNode,
     () => setTrigger("triggered")
   ];
 };
 export {
-  useNode
+  useEdge
 };
