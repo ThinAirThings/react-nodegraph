@@ -40,16 +40,19 @@ export type LifeCycleHandlers<
 export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]>
 }
-
+export type InferNode<T extends AirNode<any, any>> = T extends AirNode<infer U, infer V>?AirNode<U, V>:never
+export type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
+    [K in keyof T]: T[K] extends AirNode<infer U, infer V>?AirNode<U, V>:never
+}
 export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out extends AirNode<any, any>, T extends string='anonymous',>(
-    callback: (t1: NodeValues<In>) => Promise<NodeValue<Out>>,
-    inputNodes: In,
+    callback: (t1: NodeValues<InferNodes<In>>) => Promise<NodeValue<InferNode<Out>>>,
+    inputNodes: InferNodes<In> ,
     opts?: {
         type?: T, 
         lifecycleHandlers?: {
-            pending?: (t1: NodeValues<In>) => void,
-            success?: (t2: NodeValue<Out>, t1: NodeValues<In>) => void
-            cleanup?: (value: NodeValue<Out>) => Promise<void>|void
+            pending?: (t1: NodeValues<InferNodes<In>>) => void,
+            success?: (t2: NodeValue<InferNode<Out>>, t1: NodeValues<InferNodes<In>>) => void
+            cleanup?: (value: NodeValue<InferNode<Out>>) => Promise<void>|void
             failure?: {
                 maxRetryCount?: number
                 retry?: (error: Error, failureLog: {
@@ -95,7 +98,7 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out extends
                 return
             }
             if (outputNode.state === 'pending') {
-                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<In>;
+                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<InferNodes<In>>;
                 opts?.lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
