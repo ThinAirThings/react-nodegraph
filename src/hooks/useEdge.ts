@@ -28,8 +28,8 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
     [K in keyof In]: In[K] extends AirNode<any, infer U> ? U : never
 }
-export const useEdge = <In extends ReadonlyArray<any>, Out>(
-    type: string,
+export const useEdge = <T extends string, In extends ReadonlyArray<any>, Out>(
+    type: T,
     callback: (t1: NodeValues<In>) => Promise<Out>,
     inputNodes: In,
     lifecycleHandlers?: {
