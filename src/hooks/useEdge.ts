@@ -38,7 +38,7 @@ export type LifeCycleHandlers<
     >['lifecycleHandlers']
 
 export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
-    [K in keyof T]: NodeValue<T[K]>
+    [K in keyof T]: NodeValue<T[K]>&{type: T[K]['type']}
 }
 
 export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, OutputValue, T extends string='anonymous',>(
@@ -95,7 +95,10 @@ export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, Out
                 return
             }
             if (outputNode.state === 'pending') {
-                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<InputNodes>;
+                const nodeValues = inputNodes.map(node => ({
+                    ...(node as AirNode<any, any> & { state: 'success' }).value,
+                    type: node.type
+                }))  as NodeValues<InputNodes>
                 opts?.lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
