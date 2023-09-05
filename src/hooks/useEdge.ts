@@ -25,8 +25,9 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
         },
     ] as const
 }
-
-type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
+export type NodeValue<T extends AirNode<any, any>> = T extends {state: 'success'}?T['value']:never
+export type LifeCycleHandlers<In extends ReadonlyArray<any>, Out> = Required<Required<Parameters<typeof useEdge<In, Out>>>[2]>['lifecycleHandlers']
+export type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
     [K in keyof In]: In[K] extends AirNode<any, infer U> ? U : never
 }
 export const useEdge = <In extends ReadonlyArray<any>, Out, T extends string='anonymous',>(
@@ -96,6 +97,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out, T extends string='an
                     // Run success handler here to guarantee it run before the child's useEffect
                     opts?.lifecycleHandlers?.success?.(success, nodeValues)
                     setOutputNode(() => ({
+                        type: opts?.type??'anonymous' as T,
                         state: 'success',
                         value: success
                     }))
@@ -107,10 +109,12 @@ export const useEdge = <In extends ReadonlyArray<any>, Out, T extends string='an
                         if (newCallback) failureRetryCallbackRef.current = newCallback
                         else failureRetryCallbackRef.current = null
                         setOutputNode(() => ({
+                            type: opts?.type??'anonymous' as T,
                             state: 'pending'
                         }))
                     }
                     setOutputNode(() => ({
+                        type: opts?.type??'anonymous' as T,
                         state: 'failure',
                         error: error
                     }))

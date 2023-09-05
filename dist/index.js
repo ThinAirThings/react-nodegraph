@@ -51,6 +51,7 @@ var useEdge = (callback, inputNodes, opts) => {
           failureRetryCallbackRef.current = null;
           opts?.lifecycleHandlers?.success?.(success, nodeValues);
           setOutputNode(() => ({
+            type: opts?.type ?? "anonymous",
             state: "success",
             value: success
           }));
@@ -64,10 +65,12 @@ var useEdge = (callback, inputNodes, opts) => {
             else
               failureRetryCallbackRef.current = null;
             setOutputNode(() => ({
+              type: opts?.type ?? "anonymous",
               state: "pending"
             }));
           };
           setOutputNode(() => ({
+            type: opts?.type ?? "anonymous",
             state: "failure",
             error
           }));

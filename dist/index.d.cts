@@ -9,6 +9,10 @@ type AirNode<V, T extends string = 'anonymous'> = {
     state: 'failure';
     error: Error;
 });
+type NodeValue<T extends AirNode<any, any>> = T extends {
+    state: 'success';
+} ? T['value'] : never;
+type LifeCycleHandlers<In extends ReadonlyArray<any>, Out> = Required<Required<Parameters<typeof useEdge<In, Out>>>[2]>['lifecycleHandlers'];
 type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
     [K in keyof In]: In[K] extends AirNode<any, infer U> ? U : never;
 };
@@ -34,4 +38,4 @@ declare const useEdge: <In extends readonly any[], Out, T extends string = "anon
     } | undefined;
 } | undefined) => readonly [AirNode<Out, T>, () => Promise<void>];
 
-export { AirNode, useEdge };
+export { AirNode, LifeCycleHandlers, NodeValue, NodeValues, useEdge };
