@@ -2,7 +2,7 @@ type AirNode<T> = {
     state: 'pending';
 } | {
     state: 'success';
-    data: T;
+    value: T;
 } | {
     state: 'failure';
     error: Error;

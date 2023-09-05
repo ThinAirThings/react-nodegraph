@@ -3,7 +3,7 @@ import { useImmer } from "use-immer"
 
 export type AirNode<T> = 
     | {state: 'pending'}
-    | {state: 'success', data: T}
+    | {state: 'success', value: T}
     | {state: 'failure', error: Error}
 
 
@@ -53,7 +53,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out>(
         state: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.((outputNode as AirNode<Out> & { state: 'success' }).data)
+        lifecycleHandlers?.cleanup?.((outputNode as AirNode<Out> & { state: 'success' }).value)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
@@ -76,7 +76,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out>(
                 return
             }
             if (outputNode.state === 'pending') {
-                const nodeValues = inputNodes.map(node => (node as AirNode<any>  & { state: 'success' }).data) as NodeValues<In>;
+                const nodeValues = inputNodes.map(node => (node as AirNode<any>  & { state: 'success' }).value) as NodeValues<In>;
                 lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
@@ -90,7 +90,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out>(
                     lifecycleHandlers?.success?.(success, nodeValues)
                     setOutputNode(() => ({
                         state: 'success',
-                        data: success
+                        value: success
                     }))
                 } catch (_error) {
                     const error = _error as Error
