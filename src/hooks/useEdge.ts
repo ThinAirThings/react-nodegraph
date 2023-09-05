@@ -45,7 +45,7 @@ export type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: T[K] extends AirNode<infer U, infer V>?AirNode<U, V>:never
 }
 export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T extends string='anonymous',>(
-    callback: (t1: NodeValues<InferNodes<In>>) => Promise<Out>,
+    callback: (t1: NodeValues<In>) => Promise<Out>,
     inputNodes: InferNodes<In> ,
     opts?: {
         type?: T, 
