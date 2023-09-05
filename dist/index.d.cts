@@ -1,4 +1,6 @@
 type AirNode<T> = {
+    type: string;
+} & ({
     state: 'pending';
 } | {
     state: 'success';
@@ -6,7 +8,7 @@ type AirNode<T> = {
 } | {
     state: 'failure';
     error: Error;
-};
+});
 type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
     [K in keyof In]: In[K] extends AirNode<infer U> ? U : never;
 };

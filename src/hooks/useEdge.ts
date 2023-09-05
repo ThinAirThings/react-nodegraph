@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
 export type AirNode<T> = 
-    | {state: 'pending'}
-    | {state: 'success', value: T}
-    | {state: 'failure', error: Error}
+    {type: string} & (
+        | {state: 'pending'}
+        | {state: 'success', value: T}
+        | {state: 'failure', error: Error}
+    )
 
 
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
@@ -50,6 +52,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out>(
 ) => {
     // Set result state
     const [outputNode, setOutputNode] = useImmer<AirNode<Out>>({
+        type: 'internal',
         state: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {

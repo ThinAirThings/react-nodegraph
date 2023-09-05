@@ -17,6 +17,7 @@ var useTrigger = (cleanupCallback) => {
 };
 var useEdge = (callback, inputNodes, lifecycleHandlers) => {
   const [outputNode, setOutputNode] = useImmer({
+    type: "internal",
     state: "pending"
   });
   const [trigger, setTrigger] = useTrigger(() => {
