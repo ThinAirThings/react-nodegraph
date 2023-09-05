@@ -26,21 +26,30 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     ] as const
 }
 export type NodeValue<T extends AirNode<any, any>> = T extends {state: 'success'}?T['value']:never
-export type LifeCycleHandlers<In extends ReadonlyArray<any>, Out> = Required<Required<Parameters<typeof useEdge<In, Out>>>[2]>['lifecycleHandlers']
+export type LifeCycleHandlers<
+    In extends ReadonlyArray<AirNode<any, any>>, 
+    Out extends AirNode<any, any>
+> = Required<
+        Required<
+            Parameters<
+                typeof useEdge<In, Out>
+            >
+        >[2]
+    >['lifecycleHandlers']
 
 export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]>
 }
 
-export const useEdge = <In extends ReadonlyArray<any>, Out, T extends string='anonymous',>(
-    callback: (t1: NodeValues<In>) => Promise<Out>,
+export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out extends AirNode<any, any>, T extends string='anonymous',>(
+    callback: (t1: NodeValues<In>) => Promise<NodeValue<Out>>,
     inputNodes: In,
     opts?: {
         type?: T, 
         lifecycleHandlers?: {
             pending?: (t1: NodeValues<In>) => void,
-            success?: (t2: Out, t1: NodeValues<In>) => void
-            cleanup?: (value: Out) => Promise<void>|void
+            success?: (t2: NodeValue<Out>, t1: NodeValues<In>) => void
+            cleanup?: (value: NodeValue<Out>) => Promise<void>|void
             failure?: {
                 maxRetryCount?: number
                 retry?: (error: Error, failureLog: {
@@ -63,7 +72,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out, T extends string='an
         state: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        opts?.lifecycleHandlers?.cleanup?.((outputNode as AirNode<Out> & { state: 'success' }).value)
+        opts?.lifecycleHandlers?.cleanup?.((outputNode as AirNode<any, any> & { state: 'success' }).value)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
