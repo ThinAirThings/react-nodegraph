@@ -15,13 +15,13 @@ var useTrigger = (cleanupCallback) => {
     }
   ];
 };
-var useEdge = (type, callback, inputNodes, lifecycleHandlers) => {
+var useEdge = (callback, inputNodes, opts) => {
   const [outputNode, setOutputNode] = useImmer({
-    type,
+    type: opts?.type ?? "anonymous",
     state: "pending"
   });
   const [trigger, setTrigger] = useTrigger(() => {
-    lifecycleHandlers?.cleanup?.(outputNode.value);
+    opts?.lifecycleHandlers?.cleanup?.(outputNode.value);
   });
   const failureRetryCountRef = useRef(0);
   const failureErrorLogRef = useRef([]);
@@ -43,13 +43,13 @@ var useEdge = (type, callback, inputNodes, lifecycleHandlers) => {
       }
       if (outputNode.state === "pending") {
         const nodeValues = inputNodes.map((node) => node.value);
-        lifecycleHandlers?.pending?.(nodeValues);
+        opts?.lifecycleHandlers?.pending?.(nodeValues);
         try {
           const success = failureRetryCallbackRef.current ? await failureRetryCallbackRef.current(nodeValues) : await callback(nodeValues);
           failureRetryCountRef.current = 0;
           failureErrorLogRef.current.length = 0;
           failureRetryCallbackRef.current = null;
-          lifecycleHandlers?.success?.(success, nodeValues);
+          opts?.lifecycleHandlers?.success?.(success, nodeValues);
           setOutputNode(() => ({
             state: "success",
             value: success
@@ -71,18 +71,18 @@ var useEdge = (type, callback, inputNodes, lifecycleHandlers) => {
             state: "failure",
             error
           }));
-          if (failureRetryCountRef.current >= (lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
-            lifecycleHandlers?.failure?.final?.({
+          if (failureRetryCountRef.current >= (opts?.lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
+            opts?.lifecycleHandlers?.failure?.final?.({
               errorLog: failureErrorLogRef.current,
               maxRetryCount: failureRetryCountRef.current
             });
             return;
           }
-          lifecycleHandlers?.failure?.retry?.(error, {
+          opts?.lifecycleHandlers?.failure?.retry?.(error, {
             runRetry,
             errorLog: failureErrorLogRef.current,
             retryAttempt: failureRetryCountRef.current,
-            maxRetryCount: lifecycleHandlers?.failure?.maxRetryCount ?? 0
+            maxRetryCount: opts?.lifecycleHandlers?.failure?.maxRetryCount ?? 0
           });
         }
       }
