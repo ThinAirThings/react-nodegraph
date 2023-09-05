@@ -42,10 +42,10 @@ var useTrigger = (cleanupCallback) => {
   ];
 };
 var useEdge = (callback, inputNodes, opts) => {
-  const [outputNode, setOutputNode] = (0, import_use_immer.useImmer)({
+  const [outputNode, setOutputNode] = (0, import_use_immer.useImmer)(() => ({
     type: opts?.type ?? "anonymous",
     state: "pending"
-  });
+  }));
   const [trigger, setTrigger] = useTrigger(() => {
     opts?.lifecycleHandlers?.cleanup?.(outputNode.value);
   });

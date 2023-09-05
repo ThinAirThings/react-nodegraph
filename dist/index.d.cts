@@ -36,6 +36,6 @@ declare const useEdge: <In extends readonly AirNode<any, any>[], Out extends Air
             }) => void) | undefined;
         } | undefined;
     } | undefined;
-} | undefined) => readonly [AirNode<Out, T>, () => Promise<void>];
+} | undefined) => readonly [Out, () => Promise<void>];
 
 export { AirNode, LifeCycleHandlers, NodeValue, NodeValues, useEdge };
