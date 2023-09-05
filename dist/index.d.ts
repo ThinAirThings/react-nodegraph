@@ -40,6 +40,6 @@ declare const useEdge: <In extends readonly AirNode<any, any>[], Out extends Air
             }) => void) | undefined;
         } | undefined;
     } | undefined;
-} | undefined) => readonly [Out, () => Promise<void>];
+} | undefined) => readonly [InferNode<Out>, () => Promise<void>];
 
 export { AirNode, InferNode, InferNodes, LifeCycleHandlers, NodeValue, NodeValues, useEdge };

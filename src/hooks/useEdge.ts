@@ -70,10 +70,10 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out extends
     }
 ) => {
     // Set result state
-    const [outputNode, setOutputNode] = useImmer<Out>(() => ({
+    const [outputNode, setOutputNode] = useImmer<InferNode<Out>>(() => ({
         type: opts?.type??'anonymous' as T,
         state: 'pending'
-    }) as Out)
+    }) as InferNode<Out>)
     const [trigger, setTrigger] = useTrigger(() => {
         opts?.lifecycleHandlers?.cleanup?.((outputNode as AirNode<any, any> & { state: 'success' }).value)
     })
