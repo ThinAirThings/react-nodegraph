@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
-export type AirNode<T> = 
-    {type: string} & (
+export type AirNode<T extends string, V> = 
+    {type: T} & (
         | {state: 'pending'}
-        | {state: 'success', value: T}
+        | {state: 'success', value: V}
         | {state: 'failure', error: Error}
     )
 
@@ -26,9 +26,10 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 }
 
 type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
-    [K in keyof In]: In[K] extends AirNode<infer U> ? U : never
+    [K in keyof In]: In[K] extends AirNode<any, infer U> ? U : never
 }
 export const useEdge = <In extends ReadonlyArray<any>, Out>(
+    type: string,
     callback: (t1: NodeValues<In>) => Promise<Out>,
     inputNodes: In,
     lifecycleHandlers?: {
@@ -51,12 +52,12 @@ export const useEdge = <In extends ReadonlyArray<any>, Out>(
     }, 
 ) => {
     // Set result state
-    const [outputNode, setOutputNode] = useImmer<AirNode<Out>>({
-        type: 'internal',
+    const [outputNode, setOutputNode] = useImmer<AirNode<any, Out>>({
+        type,
         state: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {
-        lifecycleHandlers?.cleanup?.((outputNode as AirNode<Out> & { state: 'success' }).value)
+        lifecycleHandlers?.cleanup?.((outputNode as AirNode<any, Out> & { state: 'success' }).value)
     })
     // Set the retry count ref
     const failureRetryCountRef = useRef(0)
@@ -79,7 +80,7 @@ export const useEdge = <In extends ReadonlyArray<any>, Out>(
                 return
             }
             if (outputNode.state === 'pending') {
-                const nodeValues = inputNodes.map(node => (node as AirNode<any>  & { state: 'success' }).value) as NodeValues<In>;
+                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<In>;
                 lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 

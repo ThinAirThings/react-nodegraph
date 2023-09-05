@@ -1,18 +1,18 @@
-type AirNode<T> = {
-    type: string;
+type AirNode<T extends string, V> = {
+    type: T;
 } & ({
     state: 'pending';
 } | {
     state: 'success';
-    value: T;
+    value: V;
 } | {
     state: 'failure';
     error: Error;
 });
 type NodeValues<In extends ReadonlyArray<Record<string, any>>> = {
-    [K in keyof In]: In[K] extends AirNode<infer U> ? U : never;
+    [K in keyof In]: In[K] extends AirNode<any, infer U> ? U : never;
 };
-declare const useEdge: <In extends readonly any[], Out>(callback: (t1: NodeValues<In>) => Promise<Out>, inputNodes: In, lifecycleHandlers?: {
+declare const useEdge: <In extends readonly any[], Out>(type: string, callback: (t1: NodeValues<In>) => Promise<Out>, inputNodes: In, lifecycleHandlers?: {
     pending?: ((t1: NodeValues<In>) => void) | undefined;
     success?: ((t2: Out, t1: NodeValues<In>) => void) | undefined;
     cleanup?: ((value: Out) => Promise<void> | void) | undefined;
@@ -29,6 +29,6 @@ declare const useEdge: <In extends readonly any[], Out>(callback: (t1: NodeValue
             errorLog: Array<Error>;
         }) => void) | undefined;
     } | undefined;
-} | undefined) => readonly [AirNode<Out>, () => Promise<void>];
+} | undefined) => readonly [AirNode<any, Out>, () => Promise<void>];
 
 export { AirNode, useEdge };
