@@ -29,6 +29,6 @@ declare const useEdge: <T extends string, In extends readonly any[], Out>(type: 
             errorLog: Array<Error>;
         }) => void) | undefined;
     } | undefined;
-} | undefined) => readonly [AirNode<any, Out>, () => Promise<void>];
+} | undefined) => readonly [AirNode<T, Out>, () => Promise<void>];
 
 export { AirNode, useEdge };

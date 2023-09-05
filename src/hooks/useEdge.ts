@@ -52,7 +52,7 @@ export const useEdge = <T extends string, In extends ReadonlyArray<any>, Out>(
     }, 
 ) => {
     // Set result state
-    const [outputNode, setOutputNode] = useImmer<AirNode<any, Out>>({
+    const [outputNode, setOutputNode] = useImmer<AirNode<T, Out>>({
         type,
         state: 'pending'
     })
