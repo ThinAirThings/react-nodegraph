@@ -16,15 +16,11 @@ type LifeCycleHandlers<In extends ReadonlyArray<AirNode<any, any>>, Out extends 
 type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]>;
 };
-type InferNode<T extends AirNode<any, any>> = T extends AirNode<infer U, infer V> ? AirNode<U, V> : never;
-type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
-    [K in keyof T]: T[K] extends AirNode<infer U, infer V> ? AirNode<U, V> : never;
-};
 declare const useEdge: <In extends readonly AirNode<any, any>[], Out, T extends string = "anonymous">(callback: (t1: NodeValues<In>) => Promise<Out>, inputNodes: In, opts?: {
     type?: T | undefined;
     lifecycleHandlers?: {
-        pending?: ((t1: NodeValues<InferNodes<In>>) => void) | undefined;
-        success?: ((t2: Out, t1: NodeValues<InferNodes<In>>) => void) | undefined;
+        pending?: ((t1: NodeValues<In>) => void) | undefined;
+        success?: ((t2: Out, t1: NodeValues<In>) => void) | undefined;
         cleanup?: ((value: Out) => Promise<void> | void) | undefined;
         failure?: {
             maxRetryCount?: number | undefined;
@@ -42,4 +38,4 @@ declare const useEdge: <In extends readonly AirNode<any, any>[], Out, T extends 
     } | undefined;
 } | undefined) => readonly [AirNode<Out, "anonymous">, () => Promise<void>];
 
-export { AirNode, InferNode, InferNodes, LifeCycleHandlers, NodeValue, NodeValues, useEdge };
+export { AirNode, LifeCycleHandlers, NodeValue, NodeValues, useEdge };

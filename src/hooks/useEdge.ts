@@ -40,18 +40,15 @@ export type LifeCycleHandlers<
 export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]>
 }
-export type InferNode<T extends AirNode<any, any>> = T extends AirNode<infer U, infer V>?AirNode<U, V>:never
-export type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
-    [K in keyof T]: T[K] extends AirNode<infer U, infer V>?AirNode<U, V>:never
-}
+
 export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T extends string='anonymous',>(
     callback: (t1: NodeValues<In>) => Promise<Out>,
     inputNodes: In ,
     opts?: {
         type?: T, 
         lifecycleHandlers?: {
-            pending?: (t1: NodeValues<InferNodes<In>>) => void,
-            success?: (t2: Out, t1: NodeValues<InferNodes<In>>) => void
+            pending?: (t1: NodeValues<In>) => void,
+            success?: (t2: Out, t1: NodeValues<In>) => void
             cleanup?: (value: Out) => Promise<void>|void
             failure?: {
                 maxRetryCount?: number
@@ -98,7 +95,7 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T exte
                 return
             }
             if (outputNode.state === 'pending') {
-                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<InferNodes<In>>;
+                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<In>;
                 opts?.lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
