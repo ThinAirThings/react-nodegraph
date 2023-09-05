@@ -20,7 +20,7 @@ type InferNode<T extends AirNode<any, any>> = T extends AirNode<infer U, infer V
 type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: T[K] extends AirNode<infer U, infer V> ? AirNode<U, V> : never;
 };
-declare const useEdge: <In extends readonly AirNode<any, any>[], Out, T extends string = "anonymous">(callback: (t1: NodeValues<In>) => Promise<Out>, inputNodes: InferNodes<In>, opts?: {
+declare const useEdge: <In extends readonly AirNode<any, any>[], Out, T extends string = "anonymous">(callback: (t1: NodeValues<In>) => Promise<Out>, inputNodes: In, opts?: {
     type?: T | undefined;
     lifecycleHandlers?: {
         pending?: ((t1: NodeValues<InferNodes<In>>) => void) | undefined;

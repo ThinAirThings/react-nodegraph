@@ -46,7 +46,7 @@ export type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
 }
 export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T extends string='anonymous',>(
     callback: (t1: NodeValues<In>) => Promise<Out>,
-    inputNodes: InferNodes<In> ,
+    inputNodes: In ,
     opts?: {
         type?: T, 
         lifecycleHandlers?: {
