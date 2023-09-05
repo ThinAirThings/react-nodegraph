@@ -27,12 +27,12 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 }
 export type NodeValue<T extends AirNode<any, any>> = T extends {state: 'success'}?T['value']:never
 export type LifeCycleHandlers<
-    In extends ReadonlyArray<AirNode<any, any>>, 
-    Out extends AirNode<any, any>
+    InputNodes extends ReadonlyArray<AirNode<any, any>>, 
+    OutputValue
 > = Required<
         Required<
             Parameters<
-                typeof useEdge<In, Out>
+                typeof useEdge<InputNodes, OutputValue>
             >
         >[2]
     >['lifecycleHandlers']
@@ -41,15 +41,15 @@ export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]>
 }
 
-export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T extends string='anonymous',>(
-    callback: (t1: NodeValues<In>) => Promise<Out>,
-    inputNodes: In ,
+export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, OutputValue, T extends string='anonymous',>(
+    callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>,
+    inputNodes: InputNodes ,
     opts?: {
         type?: T, 
         lifecycleHandlers?: {
-            pending?: (t1: NodeValues<In>) => void,
-            success?: (t2: Out, t1: NodeValues<In>) => void
-            cleanup?: (value: Out) => Promise<void>|void
+            pending?: (t1: NodeValues<InputNodes>) => void,
+            success?: (t2: OutputValue, t1: NodeValues<InputNodes>) => void
+            cleanup?: (value: OutputValue) => Promise<void>|void
             failure?: {
                 maxRetryCount?: number
                 retry?: (error: Error, failureLog: {
@@ -67,10 +67,10 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T exte
     }
 ) => {
     // Set result state
-    const [outputNode, setOutputNode] = useImmer<AirNode<Out>>(() => ({
+    const [outputNode, setOutputValueputNode] = useImmer<AirNode<OutputValue>>(() => ({
         type: opts?.type??'anonymous' as T,
         state: 'pending'
-    }) as AirNode<Out>)
+    }) as AirNode<OutputValue>)
     const [trigger, setTrigger] = useTrigger(() => {
         opts?.lifecycleHandlers?.cleanup?.((outputNode as AirNode<any, any> & { state: 'success' }).value)
     })
@@ -82,20 +82,20 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T exte
     useEffect(() => {
         (async () => {
             if (trigger === 'triggered') {
-                setOutputNode((node) => {
+                setOutputValueputNode((node) => {
                     node.state = 'pending'
                 })
                 setTrigger('done')
                 return
             }
             if (!inputNodes.map(node => node.state === 'success').every(Boolean)) {
-                setOutputNode((node) => {
+                setOutputValueputNode((node) => {
                     node.state = 'pending'
                 })
                 return
             }
             if (outputNode.state === 'pending') {
-                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<In>;
+                const nodeValues = inputNodes.map(node => (node as AirNode<any, any>  & { state: 'success' }).value) as NodeValues<InputNodes>;
                 opts?.lifecycleHandlers?.pending?.(nodeValues)
                 try {
                     const success = failureRetryCallbackRef.current 
@@ -107,7 +107,7 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T exte
                     failureRetryCallbackRef.current = null
                     // Run success handler here to guarantee it run before the child's useEffect
                     opts?.lifecycleHandlers?.success?.(success, nodeValues)
-                    setOutputNode(() => ({
+                    setOutputValueputNode(() => ({
                         type: opts?.type??'anonymous' as T,
                         state: 'success',
                         value: success
@@ -119,12 +119,12 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T exte
                     const runRetry = (newCallback?: typeof callback) => {
                         if (newCallback) failureRetryCallbackRef.current = newCallback
                         else failureRetryCallbackRef.current = null
-                        setOutputNode(() => ({
+                        setOutputValueputNode(() => ({
                             type: opts?.type??'anonymous' as T,
                             state: 'pending'
                         }))
                     }
-                    setOutputNode(() => ({
+                    setOutputValueputNode(() => ({
                         type: opts?.type??'anonymous' as T,
                         state: 'failure',
                         error: error

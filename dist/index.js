@@ -16,7 +16,7 @@ var useTrigger = (cleanupCallback) => {
   ];
 };
 var useEdge = (callback, inputNodes, opts) => {
-  const [outputNode, setOutputNode] = useImmer(() => ({
+  const [outputNode, setOutputValueputNode] = useImmer(() => ({
     type: opts?.type ?? "anonymous",
     state: "pending"
   }));
@@ -29,14 +29,14 @@ var useEdge = (callback, inputNodes, opts) => {
   useEffect(() => {
     (async () => {
       if (trigger === "triggered") {
-        setOutputNode((node) => {
+        setOutputValueputNode((node) => {
           node.state = "pending";
         });
         setTrigger("done");
         return;
       }
       if (!inputNodes.map((node) => node.state === "success").every(Boolean)) {
-        setOutputNode((node) => {
+        setOutputValueputNode((node) => {
           node.state = "pending";
         });
         return;
@@ -50,7 +50,7 @@ var useEdge = (callback, inputNodes, opts) => {
           failureErrorLogRef.current.length = 0;
           failureRetryCallbackRef.current = null;
           opts?.lifecycleHandlers?.success?.(success, nodeValues);
-          setOutputNode(() => ({
+          setOutputValueputNode(() => ({
             type: opts?.type ?? "anonymous",
             state: "success",
             value: success
@@ -64,12 +64,12 @@ var useEdge = (callback, inputNodes, opts) => {
               failureRetryCallbackRef.current = newCallback;
             else
               failureRetryCallbackRef.current = null;
-            setOutputNode(() => ({
+            setOutputValueputNode(() => ({
               type: opts?.type ?? "anonymous",
               state: "pending"
             }));
           };
-          setOutputNode(() => ({
+          setOutputValueputNode(() => ({
             type: opts?.type ?? "anonymous",
             state: "failure",
             error
