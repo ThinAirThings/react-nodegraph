@@ -20,16 +20,16 @@ type InferNode<T extends AirNode<any, any>> = T extends AirNode<infer U, infer V
 type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: T[K] extends AirNode<infer U, infer V> ? AirNode<U, V> : never;
 };
-declare const useEdge: <In extends readonly AirNode<any, any>[], Out extends AirNode<any, any>, T extends string = "anonymous">(callback: (t1: NodeValues<InferNodes<In>>) => Promise<NodeValue<InferNode<Out>>>, inputNodes: InferNodes<In>, opts?: {
+declare const useEdge: <In extends readonly AirNode<any, any>[], Out, T extends string = "anonymous">(callback: (t1: NodeValues<InferNodes<In>>) => Promise<Out>, inputNodes: InferNodes<In>, opts?: {
     type?: T | undefined;
     lifecycleHandlers?: {
         pending?: ((t1: NodeValues<InferNodes<In>>) => void) | undefined;
-        success?: ((t2: NodeValue<InferNode<Out>>, t1: NodeValues<InferNodes<In>>) => void) | undefined;
-        cleanup?: ((value: NodeValue<InferNode<Out>>) => Promise<void> | void) | undefined;
+        success?: ((t2: Out, t1: NodeValues<InferNodes<In>>) => void) | undefined;
+        cleanup?: ((value: Out) => Promise<void> | void) | undefined;
         failure?: {
             maxRetryCount?: number | undefined;
             retry?: ((error: Error, failureLog: {
-                runRetry: (newCallback?: ((t1: NodeValues<InferNodes<In>>) => Promise<NodeValue<InferNode<Out>>>) | undefined) => void;
+                runRetry: (newCallback?: ((t1: NodeValues<InferNodes<In>>) => Promise<Out>) | undefined) => void;
                 retryAttempt: number;
                 maxRetryCount: number;
                 errorLog: Array<Error>;
@@ -40,6 +40,6 @@ declare const useEdge: <In extends readonly AirNode<any, any>[], Out extends Air
             }) => void) | undefined;
         } | undefined;
     } | undefined;
-} | undefined) => readonly [InferNode<Out>, () => Promise<void>];
+} | undefined) => readonly [AirNode<Out, "anonymous">, () => Promise<void>];
 
 export { AirNode, InferNode, InferNodes, LifeCycleHandlers, NodeValue, NodeValues, useEdge };

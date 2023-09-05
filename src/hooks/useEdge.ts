@@ -44,15 +44,15 @@ export type InferNode<T extends AirNode<any, any>> = T extends AirNode<infer U, 
 export type InferNodes<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: T[K] extends AirNode<infer U, infer V>?AirNode<U, V>:never
 }
-export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out extends AirNode<any, any>, T extends string='anonymous',>(
-    callback: (t1: NodeValues<InferNodes<In>>) => Promise<NodeValue<InferNode<Out>>>,
+export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out, T extends string='anonymous',>(
+    callback: (t1: NodeValues<InferNodes<In>>) => Promise<Out>,
     inputNodes: InferNodes<In> ,
     opts?: {
         type?: T, 
         lifecycleHandlers?: {
             pending?: (t1: NodeValues<InferNodes<In>>) => void,
-            success?: (t2: NodeValue<InferNode<Out>>, t1: NodeValues<InferNodes<In>>) => void
-            cleanup?: (value: NodeValue<InferNode<Out>>) => Promise<void>|void
+            success?: (t2: Out, t1: NodeValues<InferNodes<In>>) => void
+            cleanup?: (value: Out) => Promise<void>|void
             failure?: {
                 maxRetryCount?: number
                 retry?: (error: Error, failureLog: {
@@ -70,10 +70,10 @@ export const useEdge = <In extends ReadonlyArray<AirNode<any, any>>, Out extends
     }
 ) => {
     // Set result state
-    const [outputNode, setOutputNode] = useImmer<InferNode<Out>>(() => ({
+    const [outputNode, setOutputNode] = useImmer<AirNode<Out>>(() => ({
         type: opts?.type??'anonymous' as T,
         state: 'pending'
-    }) as InferNode<Out>)
+    }) as AirNode<Out>)
     const [trigger, setTrigger] = useTrigger(() => {
         opts?.lifecycleHandlers?.cleanup?.((outputNode as AirNode<any, any> & { state: 'success' }).value)
     })
