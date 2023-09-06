@@ -18,6 +18,13 @@ type CompositeAirNode<V extends Record<string, any>, T extends string, NodeSet e
         type: Subtype;
     }>;
 }[S], T>;
+type SubtypeAdjacencyAirNode<A extends AirNode<any, any>, AdjacencySet extends AirNode<any, any>> = AirNode<NodeValue<A> & {
+    [Subtype in AdjacencySet['type']]: {
+        subtype: Subtype;
+    } & NodeValue<AdjacencySet & {
+        type: Subtype;
+    }>;
+}[AdjacencySet['type']], A extends AirNode<any, infer T> ? T : never>;
 type NodeValue<T extends AirNode<any, any>> = T extends {
     state: 'success';
 } ? T['value'] : never;
@@ -49,4 +56,4 @@ declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputV
     } | undefined;
 } | undefined) => readonly [AirNode<OutputValue, T>, () => Promise<void>];
 
-export { AirNode, CompositeAirNode, LifeCycleHandlers, NodeValue, NodeValues, useEdge };
+export { AirNode, CompositeAirNode, LifeCycleHandlers, NodeValue, NodeValues, SubtypeAdjacencyAirNode, useEdge };

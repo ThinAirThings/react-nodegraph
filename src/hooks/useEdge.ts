@@ -18,6 +18,14 @@ export type CompositeAirNode<
     } & NodeValue<NodeSet&{type: Subtype}>
 }[S], T>
 
+export type SubtypeAdjacencyAirNode<
+    A extends AirNode<any, any>,
+    AdjacencySet extends AirNode<any, any>
+> = AirNode<NodeValue<A> & {
+    [Subtype in AdjacencySet['type']]: {
+        subtype: Subtype
+    } & NodeValue<AdjacencySet&{type: Subtype}>
+}[AdjacencySet['type']], A extends AirNode<any, infer T>?T:never>
 
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
     const [trigger, setTrigger] = useState<'triggered' | 'done'>('triggered')
