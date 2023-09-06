@@ -1,4 +1,3 @@
-import { type } from "os"
 import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
@@ -8,6 +7,16 @@ export type AirNode<V, T extends string='anonymous'> =
         | {state: 'success', value: V}
         | {state: 'failure', error: Error}
     )
+export type CompositeAirNode<
+    V extends Record<string, any>,
+    T extends string,
+    NodeSet extends AirNode<any, any>,
+    S extends NodeSet['type']
+> = AirNode<V & {
+    [Subtype in S]: {
+        subtype: Subtype
+    } & NodeValue<NodeSet&{type: Subtype}>
+}[S], T>
 
 
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {

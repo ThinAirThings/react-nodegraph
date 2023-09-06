@@ -9,6 +9,13 @@ type AirNode<V, T extends string = 'anonymous'> = {
     state: 'failure';
     error: Error;
 });
+type CompositeAirNode<V extends Record<string, any>, T extends string, NodeSet extends AirNode<any, any>, S extends NodeSet['type']> = AirNode<V & {
+    [Subtype in S]: {
+        subtype: Subtype;
+    } & NodeValue<NodeSet & {
+        type: Subtype;
+    }>;
+}[S], T>;
 type NodeValue<T extends AirNode<any, any>> = T extends {
     state: 'success';
 } ? T['value'] : never;
@@ -40,4 +47,4 @@ declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputV
     } | undefined;
 } | undefined) => readonly [AirNode<OutputValue, T>, () => Promise<void>];
 
-export { AirNode, LifeCycleHandlers, NodeValue, NodeValues, useEdge };
+export { AirNode, CompositeAirNode, LifeCycleHandlers, NodeValue, NodeValues, useEdge };
