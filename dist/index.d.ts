@@ -4,9 +4,7 @@ type AirNode<V, T extends string = 'anonymous'> = {
     state: 'pending';
 } | {
     state: 'success';
-    value: V & {
-        type: T;
-    };
+    value: V;
 } | {
     state: 'failure';
     error: Error;
