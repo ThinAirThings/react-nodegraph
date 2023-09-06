@@ -21,9 +21,9 @@ type CompositeAirNode<V extends Record<string, any>, T extends string, NodeSet e
 type SubtypeAdjacencyAirNode<A extends AirNode<any, any>, AdjacencySet extends AirNode<any, any>> = AirNode<NodeValue<A> & {
     [Subtype in AdjacencySet['type']]: {
         subtype: Subtype;
-    } & NodeValue<AdjacencySet & {
+    } & Omit<NodeValue<AdjacencySet & {
         type: Subtype;
-    }>;
+    }>, 'type'>;
 }[AdjacencySet['type']], A extends AirNode<any, infer T> ? T : never>;
 type NodeValue<T extends AirNode<any, any>> = T extends {
     state: 'success';

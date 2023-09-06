@@ -24,7 +24,7 @@ export type SubtypeAdjacencyAirNode<
 > = AirNode<NodeValue<A> & {
     [Subtype in AdjacencySet['type']]: {
         subtype: Subtype
-    } & NodeValue<AdjacencySet&{type: Subtype}>
+    } & Omit<NodeValue<AdjacencySet&{type: Subtype}>, 'type'>
 }[AdjacencySet['type']], A extends AirNode<any, infer T>?T:never>
 
 const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
