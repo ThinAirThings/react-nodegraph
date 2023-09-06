@@ -26,7 +26,7 @@ type SubtypeAdjacencyAirNode<A extends AirNode<any, any>, AdjacencySet extends A
 type NodeValue<T extends AirNode<any, any>> = T extends {
     state: 'success';
 } ? T['value'] : never;
-type LifeCycleHandlers<InputNodes extends [AirNode<any, any>, ...ReadonlyArray<AirNode<any, any>>], OutputNode extends AirNode<any, any>> = Required<Required<Parameters<typeof useEdge<InputNodes, NodeValue<OutputNode>>>>[2]>['lifecycleHandlers'];
+type LifeCycleHandlers<InputNodes extends ReadonlyArray<AirNode<any, any>>, OutputNode extends AirNode<any, any>> = Required<Parameters<typeof useEdge<InputNodes, NodeValue<OutputNode>>>>[2]['lifecycleHandlers'];
 type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]> & {
         type: T[K]['type'];
