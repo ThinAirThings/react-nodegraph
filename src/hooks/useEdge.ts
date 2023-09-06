@@ -4,7 +4,7 @@ import { useImmer } from "use-immer"
 export type AirNode<V, T extends string='anonymous'> = 
     {type: T} & (
         | {state: 'pending'}
-        | {state: 'success', value: V}
+        | {state: 'success', value: V&{type: T}}
         | {state: 'failure', error: Error}
     )
 export type CompositeAirNode<
