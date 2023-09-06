@@ -45,11 +45,11 @@ const useTrigger = (cleanupCallback?: () => Promise<void>|void) => {
 export type NodeValue<T extends AirNode<any, any>> = T extends {state: 'success'}?T['value']:never
 export type LifeCycleHandlers<
     InputNodes extends ReadonlyArray<AirNode<any, any>>, 
-    OutputValue
+    OutputNode extends AirNode<any, any>,
 > = Required<
         Required<
             Parameters<
-                typeof useEdge<InputNodes, OutputValue>
+                typeof useEdge<InputNodes, NodeValue<OutputNode>>
             >
         >[2]
     >['lifecycleHandlers']
