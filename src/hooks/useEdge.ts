@@ -18,6 +18,7 @@ export type GoalResolver<
     failure: (failureValue: NodeValue<Failure>) => void,
 }
 
+
 // export type NodeTypeString = `${Capitalize<string>}Node`
 export type NodeTypeString =
   | `${Capitalize<string>}Node`
