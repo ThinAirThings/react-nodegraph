@@ -68,10 +68,7 @@ var useEdge = (callback, inputNodes, opts) => {
         return;
       }
       if (outputNode.state === "pending") {
-        const nodeValues = inputNodes.map((node) => ({
-          ...node.value,
-          type: node.type
-        }));
+        const nodeValues = inputNodes.map((node) => node.value);
         opts?.lifecycleHandlers?.pending?.(nodeValues);
         try {
           const success = failureRetryCallbackRef.current ? await failureRetryCallbackRef.current(nodeValues) : await callback(nodeValues);
