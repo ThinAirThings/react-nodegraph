@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
+
+export type Goal<
+    Success extends AirNode<any, `${string}SuccessNode`>,
+    Failure extends AirNode<any, `${string}FailureNode`>,
+> = {
+    success: (successValue: NodeValue<Success>) => void,
+    failure: (failureValue: NodeValue<Failure>) => void,
+}
+
 export type AirNode<V, T extends string='anonymous'> = 
     {type: T} & (
         | {state: 'pending'}

@@ -1,3 +1,7 @@
+type Goal<Success extends AirNode<any, `${string}SuccessNode`>, Failure extends AirNode<any, `${string}FailureNode`>> = {
+    success: (successValue: NodeValue<Success>) => void;
+    failure: (failureValue: NodeValue<Failure>) => void;
+};
 type AirNode<V, T extends string = 'anonymous'> = {
     type: T;
 } & ({
@@ -54,4 +58,4 @@ declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputV
     } | undefined;
 } | undefined) => readonly [AirNode<OutputValue, T>, () => Promise<void>];
 
-export { AirNode, CompositeAirNode, LifeCycleHandlers, NodeValue, NodeValues, SubtypeAdjacencyAirNode, useEdge };
+export { AirNode, CompositeAirNode, Goal, LifeCycleHandlers, NodeValue, NodeValues, SubtypeAdjacencyAirNode, useEdge };
