@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
 
-export type Goal<
+export type GoalResolver<
     Success extends AirNode<any, `${string}SuccessNode`>,
     Failure extends AirNode<any, `${string}FailureNode`>,
 > = {
+
     success: (successValue: NodeValue<Success>) => void,
     failure: (failureValue: NodeValue<Failure>) => void,
 }
