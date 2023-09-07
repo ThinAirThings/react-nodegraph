@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 
+export type NodeIndex<Nodes extends AirNode<any, any>> = {
+    [Node in Nodes as Node['type']]: NodeValue<Nodes&{type: Node['type']}>
+}
+export type GoalNode = AirNode<{
+    /** Reasoning as to why this goal was chosen. */
+    reasoning: string
+}, `${string}GoalNode`>
 
 export type GoalResolver<
     Success extends AirNode<any, `${string}SuccessNode`>,
