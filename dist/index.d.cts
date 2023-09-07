@@ -6,12 +6,13 @@ type NodeIndex<Nodes extends AirNode<any, any>> = {
 type GoalNode = AirNode<{
     /** Reasoning as to why this goal was chosen. */
     reasoning: string;
-}, `${string}GoalNode`>;
-type GoalResolver<Success extends AirNode<any, `${string}SuccessNode`>, Failure extends AirNode<any, `${string}FailureNode`>> = {
+}, `${Capitalize<string>}Node`>;
+type GoalResolver<Success extends AirNode<any, `${Capitalize<string>}SuccessNode`>, Failure extends AirNode<any, `${Capitalize<string>}FailureNode`>> = {
     success: (successValue: NodeValue<Success>) => void;
     failure: (failureValue: NodeValue<Failure>) => void;
 };
-type AirNode<V, T extends string = 'anonymous'> = {
+type NodeTypeString = `${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`;
+type AirNode<V, T extends NodeTypeString = 'AnonymousNode'> = {
     type: T;
 } & ({
     state: 'pending';
@@ -22,13 +23,6 @@ type AirNode<V, T extends string = 'anonymous'> = {
     state: 'failure';
     error: Error;
 });
-type CompositeAirNode<V extends Record<string, any>, T extends string, NodeSet extends AirNode<any, any>, S extends NodeSet['type']> = AirNode<V & {
-    [Subtype in S]: {
-        subtype: Subtype;
-    } & NodeValue<NodeSet & {
-        type: Subtype;
-    }>;
-}[S], T>;
 type SubtypeAdjacencyAirNode<A extends AirNode<any, any>, AdjacencySet extends AirNode<any, any>> = AirNode<NodeValue<A> & {
     [Subtype in AdjacencySet['type']]: {
         subtype: Subtype;
@@ -45,7 +39,7 @@ type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
         type: T[K]['type'];
     };
 };
-declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputValue, T extends string = "anonymous">(callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>, inputNodes: InputNodes, opts?: {
+declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputValue, T extends NodeTypeString = "AnonymousNode">(callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>, inputNodes: InputNodes, opts?: {
     type?: T | undefined;
     lifecycleHandlers?: {
         pending?: ((t1: NodeValues<InputNodes>) => void) | undefined;
@@ -67,4 +61,4 @@ declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputV
     } | undefined;
 } | undefined) => readonly [AirNode<OutputValue, T>, () => Promise<void>];
 
-export { AirNode, CompositeAirNode, GoalNode, GoalResolver, LifeCycleHandlers, NodeIndex, NodeValue, NodeValues, SubtypeAdjacencyAirNode, useEdge };
+export { AirNode, GoalNode, GoalResolver, LifeCycleHandlers, NodeIndex, NodeTypeString, NodeValue, NodeValues, SubtypeAdjacencyAirNode, useEdge };

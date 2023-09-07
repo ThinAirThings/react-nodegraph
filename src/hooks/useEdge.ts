@@ -7,33 +7,32 @@ export type NodeIndex<Nodes extends AirNode<any, any>> = {
 export type GoalNode = AirNode<{
     /** Reasoning as to why this goal was chosen. */
     reasoning: string
-}, `${string}GoalNode`>
+}, `${Capitalize<string>}Node`>
 
 export type GoalResolver<
-    Success extends AirNode<any, `${string}SuccessNode`>,
-    Failure extends AirNode<any, `${string}FailureNode`>,
+    Success extends AirNode<any, `${Capitalize<string>}SuccessNode`>,
+    Failure extends AirNode<any, `${Capitalize<string>}FailureNode`>,
 > = {
 
     success: (successValue: NodeValue<Success>) => void,
     failure: (failureValue: NodeValue<Failure>) => void,
 }
 
-export type AirNode<V, T extends string='anonymous'> = 
+// export type NodeTypeString = `${Capitalize<string>}Node`
+export type NodeTypeString =
+  | `${Capitalize<string>}Node`
+  | `${Capitalize<string>}${Capitalize<string>}Node`
+  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
+  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
+  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
+  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
+
+export type AirNode<V, T extends NodeTypeString='AnonymousNode'> = 
     {type: T} & (
         | {state: 'pending'}
         | {state: 'success', value: V}
         | {state: 'failure', error: Error}
     )
-export type CompositeAirNode<
-    V extends Record<string, any>,
-    T extends string,
-    NodeSet extends AirNode<any, any>,
-    S extends NodeSet['type']
-> = AirNode<V & {
-    [Subtype in S]: {
-        subtype: Subtype
-    } & NodeValue<NodeSet&{type: Subtype}>
-}[S], T>
 
 export type SubtypeAdjacencyAirNode<
     A extends AirNode<any, any>,
@@ -74,7 +73,7 @@ export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]>&{type: T[K]['type']}
 }
 
-export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, OutputValue, T extends string='anonymous',>(
+export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, OutputValue, T extends NodeTypeString='AnonymousNode',>(
     callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>,
     inputNodes: InputNodes ,
     opts?: {
