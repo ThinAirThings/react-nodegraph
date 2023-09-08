@@ -162,7 +162,7 @@ export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, Out
                         state: 'failure',
                         error: error
                     }))
-                    if (failureRetryCountRef.current >= (opts?.lifecycleHandlers?.failure?.maxRetryCount ?? 0)) {
+                    if (failureRetryCountRef.current >= (opts?.lifecycleHandlers?.failure?.maxRetryCount ?? 1)) {
                         opts?.lifecycleHandlers?.failure?.final?.({
                             errorLog: failureErrorLogRef.current,
                             maxRetryCount: failureRetryCountRef.current
