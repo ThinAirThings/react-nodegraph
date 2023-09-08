@@ -13,7 +13,6 @@ export type Resolver<
     Success extends AirNode<any, any>=AirNode<Record<string, any>, any>,
     Failure extends AirNode<any, any>=AirNode<Record<string, any>, any>,
 > = {
-
     success: (successValue: NodeValue<Success>) => void,
     failure: (failureValue: NodeValue<Failure>) => void,
 }
@@ -22,14 +21,15 @@ export const useNodeResolver = () => {
     // Create Goal Resolver Ref
     const resolverRef = useRef<Resolver>()
     // Create Goal Resolver
-    const [resolutionNode] = useEdge(async () => {
+    const [resolutionNode, triggerNewResolver] = useEdge(async () => {
         return await new Promise<Record<string, any>>((success, failure) => {
             resolverRef.current = {success, failure}
         })
     }, [])
     return [
         resolverRef.current!,
-        resolutionNode
+        resolutionNode,
+        triggerNewResolver
     ] as const
 }
 

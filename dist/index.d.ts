@@ -11,7 +11,7 @@ type Resolver<Success extends AirNode<any, any> = AirNode<Record<string, any>, a
     success: (successValue: NodeValue<Success>) => void;
     failure: (failureValue: NodeValue<Failure>) => void;
 };
-declare const useNodeResolver: () => readonly [Resolver<AirNode<Record<string, any>, any>, AirNode<Record<string, any>, any>>, AirNode<Record<string, any>, "AnonymousNode">];
+declare const useNodeResolver: () => readonly [Resolver<AirNode<Record<string, any>, any>, AirNode<Record<string, any>, any>>, AirNode<Record<string, any>, "AnonymousNode">, () => Promise<void>];
 declare const nodeFromValue: <V, T extends `${Capitalize<string>}Node`>(value: V, type?: T | undefined) => AirNode<V, T>;
 type NodeTypeString = `${Capitalize<string>}Node`;
 type AirNode<V, T extends NodeTypeString = 'AnonymousNode'> = {

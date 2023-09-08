@@ -31,14 +31,15 @@ var import_react = require("react");
 var import_use_immer = require("use-immer");
 var useNodeResolver = () => {
   const resolverRef = (0, import_react.useRef)();
-  const [resolutionNode] = useEdge(async () => {
+  const [resolutionNode, triggerNewResolver] = useEdge(async () => {
     return await new Promise((success, failure) => {
       resolverRef.current = { success, failure };
     });
   }, []);
   return [
     resolverRef.current,
-    resolutionNode
+    resolutionNode,
+    triggerNewResolver
   ];
 };
 var nodeFromValue = (value, type) => {
