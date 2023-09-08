@@ -7,7 +7,7 @@ type GoalNode = AirNode<{
     /** Reasoning as to why this goal was chosen. */
     reasoning: string;
 }, `${Capitalize<string>}Node`>;
-type GoalResolver<Success extends AirNode<any, any>, Failure extends AirNode<any, any>> = {
+type GoalResolver<Success extends AirNode<any, any> = AirNode<Record<string, any>, any>, Failure extends AirNode<any, any> = AirNode<Record<string, any>, any>> = {
     success: (successValue: NodeValue<Success>) => void;
     failure: (failureValue: NodeValue<Failure>) => void;
 };

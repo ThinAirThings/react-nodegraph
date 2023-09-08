@@ -10,8 +10,8 @@ export type GoalNode = AirNode<{
 }, `${Capitalize<string>}Node`>
 
 export type GoalResolver<
-    Success extends AirNode<any, any>,
-    Failure extends AirNode<any, any>,
+    Success extends AirNode<any, any>=AirNode<Record<string, any>, any>,
+    Failure extends AirNode<any, any>=AirNode<Record<string, any>, any>,
 > = {
 
     success: (successValue: NodeValue<Success>) => void,
