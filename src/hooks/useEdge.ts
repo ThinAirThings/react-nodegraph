@@ -30,7 +30,7 @@ export const useNodeResolver = () => {
     return [
         resolverRef.current,
         resolutionNode
-    ]
+    ] as const
 }
 
 export const nodeFromValue = <V, T extends NodeTypeString>(value: V, type?: T): AirNode<V,T> => {
