@@ -12,7 +12,7 @@ type Resolver<Success extends AirNode<any, any> = AirNode<Record<string, any>, a
     failure: (failureValue: NodeValue<Failure>) => void;
 };
 declare const useNodeResolver: () => {
-    resolver: Resolver<AirNode<Record<string, any>, any>, AirNode<Record<string, any>, any>> | undefined;
+    nodeResolver: Resolver<AirNode<Record<string, any>, any>, AirNode<Record<string, any>, any>> | undefined;
     resolutionNode: AirNode<Record<string, any>, "AnonymousNode">;
 };
 declare const nodeFromValue: <V, T extends `${Capitalize<string>}Node`>(value: V, type?: T | undefined) => AirNode<V, T>;

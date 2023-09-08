@@ -28,7 +28,7 @@ export const useNodeResolver = () => {
         })
     }, [])
     return {
-        resolver: resolverRef.current,
+        nodeResolver: resolverRef.current,
         resolutionNode
     }
 }
