@@ -10,23 +10,24 @@ export type GoalNode = AirNode<{
 }, `${Capitalize<string>}Node`>
 
 export type GoalResolver<
-    Success extends AirNode<any, `${Capitalize<string>}SuccessNode`>,
-    Failure extends AirNode<any, `${Capitalize<string>}FailureNode`>,
+    Success extends AirNode<any, any>,
+    Failure extends AirNode<any, any>,
 > = {
 
     success: (successValue: NodeValue<Success>) => void,
     failure: (failureValue: NodeValue<Failure>) => void,
 }
 
-
+export const nodeFromValue = <V, T extends NodeTypeString>(value: V, type?: T): AirNode<V,T> => {
+    return {
+        type: type??'AnonymousNode' as T,
+        state: 'success' as const,
+        value: value
+    } as const
+}
 // export type NodeTypeString = `${Capitalize<string>}Node`
 export type NodeTypeString =
   | `${Capitalize<string>}Node`
-  | `${Capitalize<string>}${Capitalize<string>}Node`
-  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
-  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
-  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
-  | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`
 
 export type AirNode<V, T extends NodeTypeString='AnonymousNode'> = 
     {type: T} & (
@@ -101,7 +102,7 @@ export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, Out
 ) => {
     // Set result state
     const [outputNode, setOutputValueputNode] = useImmer<AirNode<OutputValue, T>>({
-        type: opts?.type??'anonymous' as T,
+        type: opts?.type??'AnonymousNode' as T,
         state: 'pending'
     })
     const [trigger, setTrigger] = useTrigger(() => {

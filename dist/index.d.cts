@@ -7,11 +7,12 @@ type GoalNode = AirNode<{
     /** Reasoning as to why this goal was chosen. */
     reasoning: string;
 }, `${Capitalize<string>}Node`>;
-type GoalResolver<Success extends AirNode<any, `${Capitalize<string>}SuccessNode`>, Failure extends AirNode<any, `${Capitalize<string>}FailureNode`>> = {
+type GoalResolver<Success extends AirNode<any, any>, Failure extends AirNode<any, any>> = {
     success: (successValue: NodeValue<Success>) => void;
     failure: (failureValue: NodeValue<Failure>) => void;
 };
-type NodeTypeString = `${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node` | `${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}${Capitalize<string>}Node`;
+declare const nodeFromValue: <V, T extends `${Capitalize<string>}Node`>(value: V, type?: T | undefined) => AirNode<V, T>;
+type NodeTypeString = `${Capitalize<string>}Node`;
 type AirNode<V, T extends NodeTypeString = 'AnonymousNode'> = {
     type: T;
 } & ({
@@ -39,7 +40,7 @@ type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
         type: T[K]['type'];
     };
 };
-declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputValue, T extends NodeTypeString = "AnonymousNode">(callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>, inputNodes: InputNodes, opts?: {
+declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputValue, T extends `${Capitalize<string>}Node` = "AnonymousNode">(callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>, inputNodes: InputNodes, opts?: {
     type?: T | undefined;
     lifecycleHandlers?: {
         pending?: ((t1: NodeValues<InputNodes>) => void) | undefined;
@@ -61,4 +62,4 @@ declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputV
     } | undefined;
 } | undefined) => readonly [AirNode<OutputValue, T>, () => Promise<void>];
 
-export { AirNode, GoalNode, GoalResolver, LifeCycleHandlers, NodeIndex, NodeTypeString, NodeValue, NodeValues, SubtypeAdjacencyAirNode, useEdge };
+export { AirNode, GoalNode, GoalResolver, LifeCycleHandlers, NodeIndex, NodeTypeString, NodeValue, NodeValues, SubtypeAdjacencyAirNode, nodeFromValue, useEdge };

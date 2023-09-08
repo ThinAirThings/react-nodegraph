@@ -20,6 +20,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  nodeFromValue: () => nodeFromValue,
   useEdge: () => useEdge
 });
 module.exports = __toCommonJS(src_exports);
@@ -27,6 +28,13 @@ module.exports = __toCommonJS(src_exports);
 // src/hooks/useEdge.ts
 var import_react = require("react");
 var import_use_immer = require("use-immer");
+var nodeFromValue = (value, type) => {
+  return {
+    type: type ?? "AnonymousNode",
+    state: "success",
+    value
+  };
+};
 var useTrigger = (cleanupCallback) => {
   const [trigger, setTrigger] = (0, import_react.useState)("triggered");
   return [
@@ -43,7 +51,7 @@ var useTrigger = (cleanupCallback) => {
 };
 var useEdge = (callback, inputNodes, opts) => {
   const [outputNode, setOutputValueputNode] = (0, import_use_immer.useImmer)({
-    type: opts?.type ?? "anonymous",
+    type: opts?.type ?? "AnonymousNode",
     state: "pending"
   });
   const [trigger, setTrigger] = useTrigger(() => {
@@ -124,5 +132,6 @@ var useEdge = (callback, inputNodes, opts) => {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  nodeFromValue,
   useEdge
 });

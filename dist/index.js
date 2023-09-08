@@ -1,6 +1,13 @@
 // src/hooks/useEdge.ts
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
+var nodeFromValue = (value, type) => {
+  return {
+    type: type ?? "AnonymousNode",
+    state: "success",
+    value
+  };
+};
 var useTrigger = (cleanupCallback) => {
   const [trigger, setTrigger] = useState("triggered");
   return [
@@ -17,7 +24,7 @@ var useTrigger = (cleanupCallback) => {
 };
 var useEdge = (callback, inputNodes, opts) => {
   const [outputNode, setOutputValueputNode] = useImmer({
-    type: opts?.type ?? "anonymous",
+    type: opts?.type ?? "AnonymousNode",
     state: "pending"
   });
   const [trigger, setTrigger] = useTrigger(() => {
@@ -97,5 +104,6 @@ var useEdge = (callback, inputNodes, opts) => {
   ];
 };
 export {
+  nodeFromValue,
   useEdge
 };
