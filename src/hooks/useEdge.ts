@@ -27,10 +27,10 @@ export const useNodeResolver = () => {
             resolverRef.current = {success, failure}
         })
     }, [])
-    return {
-        nodeResolver: resolverRef.current,
+    return [
+        resolverRef.current,
         resolutionNode
-    }
+    ]
 }
 
 export const nodeFromValue = <V, T extends NodeTypeString>(value: V, type?: T): AirNode<V,T> => {

@@ -8,10 +8,10 @@ var useNodeResolver = () => {
       resolverRef.current = { success, failure };
     });
   }, []);
-  return {
-    nodeResolver: resolverRef.current,
+  return [
+    resolverRef.current,
     resolutionNode
-  };
+  ];
 };
 var nodeFromValue = (value, type) => {
   return {
