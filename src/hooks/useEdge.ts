@@ -21,9 +21,9 @@ export type GoalResolver<
 export const nodeFromValue = <V, T extends NodeTypeString>(value: V, type?: T): AirNode<V,T> => {
     return {
         type: type??'AnonymousNode' as T,
-        state: 'success' as const,
+        state: 'success',
         value: value
-    } as const
+    }
 }
 // export type NodeTypeString = `${Capitalize<string>}Node`
 export type NodeTypeString =
