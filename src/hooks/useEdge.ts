@@ -28,7 +28,7 @@ export const useNodeResolver = () => {
         })
     }, [])
     return [
-        resolverRef.current,
+        resolverRef.current!,
         resolutionNode
     ] as const
 }
