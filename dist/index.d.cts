@@ -7,9 +7,13 @@ type GoalNode = AirNode<{
     /** Reasoning as to why this goal was chosen. */
     reasoning: string;
 }, `${Capitalize<string>}Node`>;
-type GoalResolver<Success extends AirNode<any, any> = AirNode<Record<string, any>, any>, Failure extends AirNode<any, any> = AirNode<Record<string, any>, any>> = {
+type Resolver<Success extends AirNode<any, any> = AirNode<Record<string, any>, any>, Failure extends AirNode<any, any> = AirNode<Record<string, any>, any>> = {
     success: (successValue: NodeValue<Success>) => void;
     failure: (failureValue: NodeValue<Failure>) => void;
+};
+declare const useNodeResolver: () => {
+    resolver: Resolver<AirNode<Record<string, any>, any>, AirNode<Record<string, any>, any>> | undefined;
+    resolutionNode: AirNode<Record<string, any>, "AnonymousNode">;
 };
 declare const nodeFromValue: <V, T extends `${Capitalize<string>}Node`>(value: V, type?: T | undefined) => AirNode<V, T>;
 type NodeTypeString = `${Capitalize<string>}Node`;
@@ -60,4 +64,4 @@ declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputV
     } | undefined;
 } | undefined) => readonly [AirNode<OutputValue, T>, () => Promise<void>];
 
-export { AirNode, GoalNode, GoalResolver, LifeCycleHandlers, NodeIndex, NodeTypeString, NodeValue, NodeValues, SubtypeAdjacencyAirNode, nodeFromValue, useEdge };
+export { AirNode, GoalNode, LifeCycleHandlers, NodeIndex, NodeTypeString, NodeValue, NodeValues, Resolver, SubtypeAdjacencyAirNode, nodeFromValue, useEdge, useNodeResolver };

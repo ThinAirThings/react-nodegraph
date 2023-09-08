@@ -21,13 +21,26 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   nodeFromValue: () => nodeFromValue,
-  useEdge: () => useEdge
+  useEdge: () => useEdge,
+  useNodeResolver: () => useNodeResolver
 });
 module.exports = __toCommonJS(src_exports);
 
 // src/hooks/useEdge.ts
 var import_react = require("react");
 var import_use_immer = require("use-immer");
+var useNodeResolver = () => {
+  const resolverRef = (0, import_react.useRef)();
+  const [resolutionNode] = useEdge(async () => {
+    return await new Promise((success, failure) => {
+      resolverRef.current = { success, failure };
+    });
+  }, []);
+  return {
+    resolver: resolverRef.current,
+    resolutionNode
+  };
+};
 var nodeFromValue = (value, type) => {
   return {
     type: type ?? "AnonymousNode",
@@ -133,5 +146,6 @@ var useEdge = (callback, inputNodes, opts) => {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   nodeFromValue,
-  useEdge
+  useEdge,
+  useNodeResolver
 });

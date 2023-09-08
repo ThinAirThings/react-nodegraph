@@ -1,6 +1,18 @@
 // src/hooks/useEdge.ts
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
+var useNodeResolver = () => {
+  const resolverRef = useRef();
+  const [resolutionNode] = useEdge(async () => {
+    return await new Promise((success, failure) => {
+      resolverRef.current = { success, failure };
+    });
+  }, []);
+  return {
+    resolver: resolverRef.current,
+    resolutionNode
+  };
+};
 var nodeFromValue = (value, type) => {
   return {
     type: type ?? "AnonymousNode",
@@ -105,5 +117,6 @@ var useEdge = (callback, inputNodes, opts) => {
 };
 export {
   nodeFromValue,
-  useEdge
+  useEdge,
+  useNodeResolver
 };
