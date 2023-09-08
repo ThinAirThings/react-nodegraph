@@ -39,7 +39,7 @@ type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
     [K in keyof T]: NodeValue<T[K]> & {
         type: T[K]['type'];
     };
-};
+}[keyof T];
 declare const useEdge: <InputNodes extends readonly AirNode<any, any>[], OutputValue, T extends `${Capitalize<string>}Node` = "AnonymousNode">(callback: (t1: NodeValues<InputNodes>) => Promise<OutputValue>, inputNodes: InputNodes, opts?: {
     type?: T | undefined;
     lifecycleHandlers?: {
