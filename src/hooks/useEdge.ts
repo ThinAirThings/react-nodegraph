@@ -72,7 +72,7 @@ export type LifeCycleHandlers<
     >[2]['lifecycleHandlers']
 
 export type NodeValues<T extends ReadonlyArray<AirNode<any, any>>> = {
-    [K in keyof T]: NodeValue<T[K]>&{type: T[K]['type']}
+    [K in keyof T]: NodeValue<T[K]>
 }
 
 export const useEdge = <InputNodes extends ReadonlyArray<AirNode<any, any>>, OutputValue, T extends NodeTypeString='AnonymousNode',>(
